@@ -36,7 +36,7 @@ map.on('load', function () {
 
     map.addSource("pcrs", {
         type: "geojson",
-        data: "http://texashealthdata.com/TCHMB/pcr",
+        data: "https://texashealthdata.com/TCHMB/pcr",
         generateId: true,
     })
     map.addSource("nat_hospitals", {
