@@ -6,7 +6,7 @@ var bounds = [
     [-86.097884,40.646082]  // Northeast coordinates
 ];
 var firstSymbolId;
-var hoveredInstId = null;
+var hoveredPcrId = null;
 var zoomThreshold = 5.5
 var COLORS = ['#4899D5','#2C3C7E','#0085CF','#BFAD83','#EAAB00','#EFB666','#D7A3B3','#90313E','#BF3B3B','#DA2B1F','#497B59', "#719B50"]
 var outlines = ["#005782", "#ED8C00", "#C7362D", "#00973A"]
@@ -20,12 +20,20 @@ var map = new mapboxgl.Map({
     minZoom:3.5
     // maxBounds: bounds,
 });
+// map.addControl(
+//     new MapboxGeocoder({
+//     accessToken: mapboxgl.accessToken,
+//     mapboxgl: mapboxgl
+//     })
+// );
 map.getCanvas().style.cursor = "auto"
 var nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-right');
 
 
 map.on('load', function () {
+
+
     var layers = map.getStyle().layers;
     for (var i = 0; i < layers.length; i++) {
         if (layers[i].type === 'symbol') {
@@ -39,11 +47,7 @@ map.on('load', function () {
         data: "https://texashealthdata.com/TCHMB/pcr",
         generateId: true,
     })
-    map.addSource("nat_hospitals", {
-        type: "geojson",
-        data: "https://texashealthdata.com/TCHMB/nat-hospitals",
-        generateId: true,
-    })
+
 
     // map.addSource("counties", {
     //     type: "geojson",
@@ -71,7 +75,11 @@ map.on('load', function () {
         'source':'pcrs',
         // 'maxzoom': zoomThreshold,
         'paint':{
-            "fill-color": "#aaa",
+            "fill-color": ["case",
+            ["boolean", ["feature-state", "hover"], false],
+            "#00B1AA",
+            "#ccc"
+        ],
             "fill-opacity": 0.7
         }
     }, firstSymbolId);
@@ -105,25 +113,12 @@ map.on('load', function () {
         'source':'pcrs',
         // 'minzoom': zoomThreshold,
         'paint':{
-            "line-color": "#fff",
-            "line-width": 2,
+            "line-color":  "#fff",
+            "line-width":2,
             "line-opacity": 1
         }
     }, firstSymbolId);
 
-    // map.addLayer({
-    //     'id': 'hospitals',
-    //     'type': 'circle',
-    //     'source':'nat_hospitals',
-    //     // 'maxzoom': zoomThreshold,
-    //     'paint': {            
-    //         'circle-color': '#fff',
-    //         'circle-opacity': 0.75,
-    //         'circle-radius': 4,
-    //         'circle-stroke-width': 1,
-    //         'circle-stroke-color': '#D1618B'
-    //         }
-    //     });
 
     map.addLayer({
         'id': 'pcr_alphabet',
@@ -172,46 +167,44 @@ map.on('load', function () {
     // });
 
 
-    map.on('mousemove', 'inst_fills', function (e) {
+    map.on('mousemove', 'pcrs_fill', function (e) {
         if (e.features.length > 0) {
-            if (hoveredInstId>=0) {
+            if (hoveredPcrId>=0) {
                 
                 map.setFeatureState(
-                    { source: 'institutions', id: hoveredInstId },
+                    { source: 'pcrs', id: hoveredPcrId },
                     { hover: false }
                 );
             }
 
-            var inst = e.features[0].properties.name
-            var region_num = e.features[0].properties.region_num
-            var inst_num = e.features[0].properties.dial_num
-            $("#popup1").css("display","block")
-            $("#popup1").html("<p class='inst-name'>"+inst+"</p>")
+            var pcr = e.features[0].properties.PCR_name
+            $("#pcr-pop").html("<p class='pcr-name'>"+pcr+"</p>")
+            $("#pcr-pop").css("display","flex")
 
             map.getCanvas().style.cursor = "pointer"
-            hoveredInstId = e.features[0].id;
+            hoveredPcrId = e.features[0].id;
             map.setFeatureState(
-                { source: 'institutions', id: hoveredInstId },
+                { source: 'pcrs', id: hoveredPcrId },
                 { hover: true }
             );
         }
     });
-    map.on('mouseleave', 'inst_fills', function () {
-        if (hoveredInstId>=0) {
+    map.on('mouseleave', 'pcrs_fill', function () {
+        if (hoveredPcrId>=0) {
             map.setFeatureState(
-                { source: 'institutions', id: hoveredInstId },
+                { source: 'pcrs', id: hoveredPcrId },
                 { hover: false }
             );
         }
-        $("#popup1").css("display","none")
-        hoveredInstId = null;
+        $("#pcr-pop").css("display","none")
+        hoveredPcrId = null;
         map.getCanvas().style.cursor = "auto"
     });
 
 
     map.on('click', 'inst_fills',function (e) {
-        console.log(hoveredInstId)
-        if (hoveredInstId || hoveredInstId==0) {
+        console.log(hoveredPcrId)
+        if (hoveredPcrId || hoveredPcrId==0) {
             
             var inst = e.features[0].properties.name
             var inst_id= e.features[0].properties.id
@@ -225,8 +218,8 @@ map.on('load', function () {
         
     });
     map.on('click', function (e) {
-        console.log(hoveredInstId)
-        if (hoveredInstId || hoveredInstId==0) {
+        console.log(hoveredPcrId)
+        if (hoveredPcrId || hoveredPcrId==0) {
             $("#popup2").css("display", "block")
             
         }else{
@@ -235,6 +228,17 @@ map.on('load', function () {
         
     });
 
+    $(".hospital-ctrl").on("click", function(e) {
+        var layer = $(this).val();
+        if(this.checked){
+            map.setLayoutProperty(layer, 'visibility', 'visible');
+        }else{
+            map.setLayoutProperty(layer, 'visibility', 'none');
+        }
+        
+    })
+    // map.setLayoutProperty('nat-inprogress', 'visibility', 'none');
+    // map.setLayoutProperty('nat-notenrolled', 'visibility', 'none');
 });
 
 $("#mapwrap").on("mousemove", function(e){
@@ -242,10 +246,12 @@ $("#mapwrap").on("mousemove", function(e){
     var divX = position.x
     var divY = position.y
 
+    var popWidth= $("#pcr-pop")[0].getBoundingClientRect().width;
+    console.log(popWidth)
     var mouseX=e.clientX
     var mouseY=e.clientY
-    $("#popup1").css("top", mouseY-divY+18)
-    $("#popup1").css("left", mouseX-divX-100)
+    $("#pcr-pop").css("top", mouseY-divY+18)
+    $("#pcr-pop").css("left", mouseX-divX-popWidth/2)
 })
 
 $("#exit").on("click", function(){

@@ -10,7 +10,7 @@
 }
 #mapwrap{
     position: relative;
-    width:65%;
+    width:100%;
     margin: auto;
     height: 100vh;
 }
@@ -19,4 +19,27 @@
     height: 100%;
     position: relative;
 }
+#menu{
+    z-index: 5;
+    position: absolute;
+    bottom: 0;
+    right:0;
+    background-color: #fff;
+    min-width: 300px;
+    padding: 20px;
+}
+#pcr-pop{
+    position: absolute;
+    top:0;
+    z-index: 6;
+    background: #ffffffee;
+    padding: 5px 10px;
+    display: none;
+}
 
+#pcr-pop .pcr-name{
+    font-weight: 100;
+    font-size: 18px;
+    color: #00B1AA;
+    margin-bottom: 0;
+}
