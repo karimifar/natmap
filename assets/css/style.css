@@ -38,8 +38,28 @@
 }
 
 #pcr-pop .pcr-name{
-    font-weight: 100;
-    font-size: 18px;
-    color: #00B1AA;
+    font-weight: 800;
+    font-size: 14px;
+    color: #222;
     margin-bottom: 0;
+}
+.mapboxgl-popup-content{
+    background: #ffffffee;
+}
+.hosp-pop h3{
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+.hosp-pop p{
+    margin-bottom: 5px;
+}
+.hosp-pop .enrolled{
+    color:green;
+}
+.hosp-pop .in-progress{
+    color: sandybrown;
+}
+.hosp-pop .not-enrolled{
+    color: #D1618B;
 }

@@ -16,7 +16,7 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/karimifar/ckkd94fbp02ij17p9z9lm7rwa',
     center: [-100.113241, 31.079125],
     zoom: 4.8,
-    maxZoom: 9,
+    maxZoom: 15,
     minZoom:3.5
     // maxBounds: bounds,
 });
@@ -47,26 +47,6 @@ map.on('load', function () {
         data: "https://texashealthdata.com/TCHMB/pcr",
         generateId: true,
     })
-
-
-    // map.addSource("counties", {
-    //     type: "geojson",
-    //     data: "https://texashealthdata.com/NAS/counties",
-    //     generateId: true,
-    // })
-
-    // map.addLayer({
-    //     'id': 'counties-outline',
-    //     'type': 'line',
-    //     'source':'counties',
-    //     'minzoom': zoomThreshold,
-    //     'paint':{
-    //         "line-color": "#000",
-    //         "line-width": 1,
-    //         "line-opacity": 0.5
-    //     }
-    // }, firstSymbolId);
-
     
 
     map.addLayer({
@@ -84,28 +64,7 @@ map.on('load', function () {
         }
     }, firstSymbolId);
 
-    // map.addLayer({
-    //     'id': 'counties-text',
-    //     'type': 'symbol',
-    //     'source':'counties',
-    //     'minzoom': zoomThreshold,
-    //     'layout': {
-    //         // get the title name from the source's "title" property
-    //         'text-field': ['get', 'countyName'],
-    //         'text-font': [
-    //             'DIN Pro Regular',
-    //             'Arial Unicode MS Bold'
-    //         ],
-    //         'text-size':10,
-    //         'text-offset': [0, 0],
-    //         // 'text-anchor': 'center'
-    //         },
-    //     'paint':{
-    //         'text-color': "#222",
-    //         // 'text-halo-color': "#fff",
-    //         // 'text-halo-width': 0.1,
-    //     }
-    // }, firstSymbolId);
+
 
     map.addLayer({
         'id': 'pcrs_outline',
@@ -135,6 +94,7 @@ map.on('load', function () {
             'text-size': 24,
             'text-offset': [0, 0],
             // 'text-ignore-placement': true,
+            'text-allow-overlap':true,
             'text-max-width': 5,
             'text-line-height':1,
             // 'text-anchor': 'center'
@@ -147,24 +107,7 @@ map.on('load', function () {
             
         }
     });
-    
-    // map.addLayer({
-    //     'id': 'region_names',
-    //     'type': 'symbol',
-    //     'source':'regions-points',
-    //     'maxzoom': zoomThreshold,
-    //     'layout': {
-    //         // get the title name from the source's "title" property
-    //         'text-field': ['get', 'name'],
-    //         'text-font': [
-    //         'Open Sans Semibold',
-    //         'Arial Unicode MS Bold'
-    //         ],
-    //         'text-size': 12,
-    //         'text-offset': [0, 1.25],
-    //         // 'text-anchor': 'center'
-    //         }
-    // });
+
 
 
     map.on('mousemove', 'pcrs_fill', function (e) {
@@ -176,10 +119,12 @@ map.on('load', function () {
                     { hover: false }
                 );
             }
-
             var pcr = e.features[0].properties.PCR_name
             $("#pcr-pop").html("<p class='pcr-name'>"+pcr+"</p>")
-            $("#pcr-pop").css("display","flex")
+            if(!popup.isOpen()){
+                $("#pcr-pop").css("display","flex")
+            }
+            
 
             map.getCanvas().style.cursor = "pointer"
             hoveredPcrId = e.features[0].id;
@@ -201,7 +146,54 @@ map.on('load', function () {
         map.getCanvas().style.cursor = "auto"
     });
 
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: [0, -5],
+        className: 'hosp-pop'
+    });
 
+    hoverLayer(map,'nat-enrolled');
+    hoverLayer(map,'nat-inprogress');
+    hoverLayer(map,'nat-notenrolled');
+    
+    function hoverLayer(map,layername){
+        map.on('mouseenter', layername, function (e) {
+            $("#pcr-pop").css("display", "none")
+            // Change the cursor style as a UI indicator.
+            map.getCanvas().style.cursor = 'pointer';
+            var feature = e.features[0];
+            var feature_id = feature.id
+            map.setFeatureState(
+                { source: 'composite', sourceLayer: 'nat-enrolled' , id: feature_id },
+                { hover: true }
+            );
+            console.log(feature.state)
+            
+            // map.setPaintProperty(
+            //     layername, 
+            //     'cricle-opacity', 
+            //     ['match', ['get', 'id'], feature_id, 1]
+            // );
+            var coordinates = feature.geometry.coordinates.slice();
+            var enrollment = feature.properties.Enrollment_Status;
+            var enroll_class = enrollment.replace(/\s+/g, '-').toLowerCase();
+
+            var description = '<p class='+enroll_class+'>' + enrollment + '</p><h3>' + feature.properties.Facility_Name + '</h3>'
+             
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates).setHTML(description).addTo(map);
+            
+        });
+             
+        map.on('mouseleave', layername, function () {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+            // $("#pcr-pop").css("display", "flex")
+        });
+    }
+    
     map.on('click', 'inst_fills',function (e) {
         console.log(hoveredPcrId)
         if (hoveredPcrId || hoveredPcrId==0) {
@@ -218,7 +210,6 @@ map.on('load', function () {
         
     });
     map.on('click', function (e) {
-        console.log(hoveredPcrId)
         if (hoveredPcrId || hoveredPcrId==0) {
             $("#popup2").css("display", "block")
             
@@ -238,7 +229,7 @@ map.on('load', function () {
         
     })
     // map.setLayoutProperty('nat-inprogress', 'visibility', 'none');
-    // map.setLayoutProperty('nat-notenrolled', 'visibility', 'none');
+    // map.setLayoutProperty('all-hospitals', 'visibility', 'none');
 });
 
 $("#mapwrap").on("mousemove", function(e){
@@ -247,7 +238,6 @@ $("#mapwrap").on("mousemove", function(e){
     var divY = position.y
 
     var popWidth= $("#pcr-pop")[0].getBoundingClientRect().width;
-    console.log(popWidth)
     var mouseX=e.clientX
     var mouseY=e.clientY
     $("#pcr-pop").css("top", mouseY-divY+18)
