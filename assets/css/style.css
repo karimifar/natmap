@@ -22,21 +22,71 @@
 #menu{
     z-index: 5;
     position: absolute;
-    bottom: 0;
-    right:0;
+    bottom: 5%;
+    right:3%;
     background-color: #fff;
-    min-width: 300px;
+    width: fit-content;
+    max-width: 100%;
     padding: 20px;
+    border-radius: 10px;
+}
+#menu h3{
+    font-weight: 900;
+}
+input[type=checkbox]{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(1.5); /* IE */
+  -moz-transform: scale(1.5); /* FF */
+  -webkit-transform: scale(1.5); /* Safari and Chrome */
+  -o-transform: scale(1.5); /* Opera */
+  transform: scale(1.5);
+  padding: 10px;
+  width:2em;
+}
+.enr-label{
+    color: #448843;
+    font-weight: 700;
+}
+.inp-label{
+    color: #f2a900;
+    font-weight: 700;
 }
 #pcr-pop{
     position: absolute;
     top:0;
     z-index: 6;
     background: #ffffffee;
-    padding: 5px 10px;
     display: none;
+    padding: 2px;
+    flex-direction: column;
 }
-
+#pcr-pop .info{
+    padding: 5px 10px;
+}
+#barchart{
+    width:100%;
+    display: flex;
+    background: #ddd;
+}
+#barchart .bar{
+    height:5px;
+}
+.enr-p{
+    background: #448843;
+}
+.inp-p{
+    background: #f2a900;
+}
+#pcr-pop p{
+    margin-bottom: 0;
+    font-size: 12px;
+}
+.enr_info span{
+    color: #448843
+}
+.inp_info span{
+    color: #f2a900
+}
 #pcr-pop .pcr-name{
     font-weight: 800;
     font-size: 14px;
@@ -63,3 +113,4 @@
 .hosp-pop .not-enrolled{
     color: #D1618B;
 }
+

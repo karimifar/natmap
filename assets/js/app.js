@@ -7,9 +7,15 @@ var bounds = [
 ];
 var firstSymbolId;
 var hoveredPcrId = null;
-var zoomThreshold = 5.5
-var COLORS = ['#4899D5','#2C3C7E','#0085CF','#BFAD83','#EAAB00','#EFB666','#D7A3B3','#90313E','#BF3B3B','#DA2B1F','#497B59', "#719B50"]
-var outlines = ["#005782", "#ED8C00", "#C7362D", "#00973A"]
+var zoomThreshold = 9
+var pcr_data;
+var req_url = "https://texashealthdata.com/api/tchmb/nat/pcrs"
+
+$.get(req_url, function(data){
+    pcr_data = data;
+    console.log(pcr_data)
+})
+
 
 var map = new mapboxgl.Map({
     container: 'map',
@@ -83,7 +89,7 @@ map.on('load', function () {
         'id': 'pcr_alphabet',
         'type': 'symbol',
         'source':'pcrs',
-        // 'maxzoom': zoomThreshold,
+        'maxzoom': zoomThreshold,
         'layout': {
             // get the title name from the source's "title" property
             'text-field': ['get', 'PCR'],
@@ -119,8 +125,35 @@ map.on('load', function () {
                     { hover: false }
                 );
             }
-            var pcr = e.features[0].properties.PCR_name
-            $("#pcr-pop").html("<p class='pcr-name'>"+pcr+"</p>")
+            var pcr = e.features[0].properties.PCR_name;
+            var pcr_a = "PCR " + e.features[0].properties.PCR;
+            var thePCR;
+            for (var i=0; i<pcr_data.length; i++){
+                if(pcr_data[i].pcr == pcr_a){
+                    thePCR = pcr_data[i];
+                }
+            }
+            var hosp_t = thePCR.hospitals_t;
+            var enr_n = thePCR.enrolled_n | 0;
+            var inp_n = thePCR.in_progress_n | 0;
+
+            var enr_p = thePCR.enrolled_p + "%"
+            var inp_p = thePCR.in_progress_p + "%"
+            var enrBar= "<div class='bar enr-p' style=width:"+enr_p+"><div>"
+            var inpBar= "<div class='bar inp-p' style=width:"+inp_p+"><div>"
+            var barchart = $("<div id='barchart'>")
+                .append(enrBar)
+                .append(inpBar)
+
+            var pcr_name = "<p class='pcr-name'>"+pcr+"</p>";
+            var totalHosp = "<p class='total-hosp'><span>Total hospitals: </span>"+hosp_t+"</p>";
+            var enr_info = "<p class='enr_info'><span>Enrolled: </span>"+enr_n+"</p>";
+            var inp_info = "<p class='inp_info'><span>Enrollment in progress: </span>"+inp_n+"</p>";
+
+            var infDiv = $("<div class='info'>")
+                .append(pcr_name).append(totalHosp).append(enr_info).append(inp_info)
+            $("#pcr-pop").html(infDiv)
+                .append(barchart)
             if(!popup.isOpen()){
                 $("#pcr-pop").css("display","flex")
             }
@@ -164,17 +197,12 @@ map.on('load', function () {
             map.getCanvas().style.cursor = 'pointer';
             var feature = e.features[0];
             var feature_id = feature.id
-            map.setFeatureState(
-                { source: 'composite', sourceLayer: 'nat-enrolled' , id: feature_id },
-                { hover: true }
-            );
-            console.log(feature.state)
-            
-            // map.setPaintProperty(
-            //     layername, 
-            //     'cricle-opacity', 
-            //     ['match', ['get', 'id'], feature_id, 1]
+            // map.setFeatureState(
+            //     { source: 'composite', sourceLayer: 'nat-enrolled' , id: feature_id },
+            //     { hover: true }
             // );
+            // console.log(feature.state)
+            
             var coordinates = feature.geometry.coordinates.slice();
             var enrollment = feature.properties.Enrollment_Status;
             var enroll_class = enrollment.replace(/\s+/g, '-').toLowerCase();
@@ -190,34 +218,10 @@ map.on('load', function () {
         map.on('mouseleave', layername, function () {
             map.getCanvas().style.cursor = '';
             popup.remove();
-            // $("#pcr-pop").css("display", "flex")
         });
     }
     
-    map.on('click', 'inst_fills',function (e) {
-        console.log(hoveredPcrId)
-        if (hoveredPcrId || hoveredPcrId==0) {
-            
-            var inst = e.features[0].properties.name
-            var inst_id= e.features[0].properties.id
-            var region_num = e.features[0].properties.region_num
-            var inst_num = e.features[0].properties.dial_num
-
-            showPopup(inst_id,region_num,inst_num);
-        }else{
-            $("#popup2").css("display", "none")
-        }
-        
-    });
-    map.on('click', function (e) {
-        if (hoveredPcrId || hoveredPcrId==0) {
-            $("#popup2").css("display", "block")
-            
-        }else{
-            $("#popup2").css("display", "none")
-        }
-        
-    });
+    
 
     $(".hospital-ctrl").on("click", function(e) {
         var layer = $(this).val();
@@ -244,51 +248,31 @@ $("#mapwrap").on("mousemove", function(e){
     $("#pcr-pop").css("left", mouseX-divX-popWidth/2)
 })
 
-$("#exit").on("click", function(){
-    
-    $("#popup2").css("display", "none")
-})
 
 
 
-$("#zip-submit").on("click", function(event){
-    event.preventDefault();
-    search_input = $("#zip-input").val().trim();
-    
-    if (isNaN(search_input)){
-       alert("Please enter a Zip code")
+
+map.on('click', 'inst_fills',function (e) {
+    console.log(hoveredPcrId)
+    if (hoveredPcrId || hoveredPcrId==0) {
+        
+        var inst = e.features[0].properties.name
+        var inst_id= e.features[0].properties.id
+        var region_num = e.features[0].properties.region_num
+        var inst_num = e.features[0].properties.dial_num
+
+        showPopup(inst_id,region_num,inst_num);
     }else{
-        var req_url= "https://texashealthdata.com/api/cpan/codebyzip/" + search_input;
-        
-        $.get(req_url, function(data){
-            if(data[0]){
-                console.log(data)
-                var inst_id = data[0].hub;
-                var reg_code = data[0].menu[0];
-                var inst_code = data[0].menu[1];
-
-                var z_lat = data[0].zip_county.z_lat;
-                var z_lng = data[0].zip_county.z_lng;
-
-                map.flyTo({
-                    center:[z_lng,z_lat],
-                    zoom: 10
-                })
-                
-                showPopup(inst_id,reg_code,inst_code)
-            }else{
-                alert("please enter a valid zip code")
-            }
-            
-        })
-        
+        $("#popup2").css("display", "none")
     }
     
-})
-
-function showPopup(id,reg_code,inst_code){
-    $("#popup2").css("display", "block")
-    var logoPath = "./assets/inst-logos/"+ id + ".png"
-    $("#instructions").html("<div class='instructions'><p>Once you've connected, press:<p> <span>" + reg_code+"</span> for region and <br><span>" + inst_code+"</span> for institution</p></div>")
-    $("#instructions").append("<div class='inst-logo'><img src='"+logoPath+"'></div>")
-}
+});
+map.on('click', function (e) {
+    if (hoveredPcrId || hoveredPcrId==0) {
+        $("#popup2").css("display", "block")
+        
+    }else{
+        $("#popup2").css("display", "none")
+    }
+    
+});
