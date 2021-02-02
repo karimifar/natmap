@@ -147,8 +147,8 @@ map.on('load', function () {
 
             var pcr_name = "<p class='pcr-name'>"+pcr+"</p>";
             var totalHosp = "<p class='total-hosp'><span>Total hospitals: </span>"+hosp_t+"</p>";
-            var enr_info = "<p class='enr_info'><span>Enrolled: </span>"+enr_n+"</p>";
-            var inp_info = "<p class='inp_info'><span>Enrollment in progress: </span>"+inp_n+"</p>";
+            var enr_info = "<p class='enr_info'><span>Enrolled: </span>"+enr_n+" ("+enr_p+")</p>";
+            var inp_info = "<p class='inp_info'><span>Enrollment in progress: </span>"+inp_n+" ("+inp_p+")</p>";
 
             var infDiv = $("<div class='info'>")
                 .append(pcr_name).append(totalHosp).append(enr_info).append(inp_info)
