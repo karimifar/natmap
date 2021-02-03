@@ -63,12 +63,12 @@ input[type=checkbox]{
 #pcr-pop .info{
     padding: 5px 10px;
 }
-#barchart{
+.barchart{
     width:100%;
     display: flex;
     background: #ddd;
 }
-#barchart .bar{
+.barchart .bar{
     height:7px;
 }
 .enr-p{

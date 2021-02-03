@@ -14,6 +14,19 @@ var req_url = "https://texashealthdata.com/api/tchmb/nat/pcrs"
 $.get(req_url, function(data){
     pcr_data = data;
     console.log(pcr_data)
+    var total = pcr_data[pcr_data.length-1]
+    console.log(total)
+    $("#tot-enr").html("("+total.enrolled_n+")")
+    $("#tot-inp").html("("+total.in_progress_n+")")
+    $("#menu form").append("Total number of birthing hospitals: "+total.hospitals_t)
+
+    var enrBar= "<div class='bar enr-p' style=width:"+total.enrolled_p+"%><div>"
+    var inpBar= "<div class='bar inp-p' style=width:"+total.in_progress_p+"%><div>"
+    var barchart = $("<div class='barchart'>")
+        .append(enrBar)
+        .append(inpBar)
+    $("#menu").append(barchart)
+
 })
 
 
@@ -21,7 +34,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/karimifar/ckkd94fbp02ij17p9z9lm7rwa',
     center: [-100.113241, 31.079125],
-    zoom: 4.8,
+    zoom: 5.2,
     maxZoom: 15,
     minZoom:3.5
     // maxBounds: bounds,
@@ -141,7 +154,7 @@ map.on('load', function () {
             var inp_p = thePCR.in_progress_p + "%"
             var enrBar= "<div class='bar enr-p' style=width:"+enr_p+"><div>"
             var inpBar= "<div class='bar inp-p' style=width:"+inp_p+"><div>"
-            var barchart = $("<div id='barchart'>")
+            var barchart = $("<div class='barchart'>")
                 .append(enrBar)
                 .append(inpBar)
 
