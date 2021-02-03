@@ -34,7 +34,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/karimifar/ckkd94fbp02ij17p9z9lm7rwa',
     center: [-100.113241, 31.079125],
-    zoom: 5.2,
+    zoom: 5,
     maxZoom: 15,
     minZoom:3.5
     // maxBounds: bounds,
@@ -209,6 +209,7 @@ map.on('load', function () {
             // Change the cursor style as a UI indicator.
             map.getCanvas().style.cursor = 'pointer';
             var feature = e.features[0];
+            console.log(feature)
             var feature_id = feature.id
             // map.setFeatureState(
             //     { source: 'composite', sourceLayer: 'nat-enrolled' , id: feature_id },
@@ -218,9 +219,10 @@ map.on('load', function () {
             
             var coordinates = feature.geometry.coordinates.slice();
             var enrollment = feature.properties.Enrollment_Status;
+            var county = feature.properties.County_of_Location;
             var enroll_class = enrollment.replace(/\s+/g, '-').toLowerCase();
 
-            var description = '<p class='+enroll_class+'>' + enrollment + '</p><h3>' + feature.properties.Facility_Name + '</h3>'
+            var description = '<p class='+enroll_class+'>' + enrollment + '</p><h3>' + feature.properties.Facility_Name + '</h3><p>Located in: <span>'+county+" county</span></p>"
              
             // Populate the popup and set its coordinates
             // based on the feature found.

@@ -22,16 +22,18 @@
 #menu{
     z-index: 5;
     position: absolute;
-    bottom: 5%;
-    left:3%;
+    bottom: 15px;
+    left:15px;
     background-color: #fff;
     width: fit-content;
     max-width: 100%;
     padding: 20px;
     border-radius: 10px;
+    box-shadow: #ddd 0 0 6px 2px;
 }
 #menu h3{
     font-weight: 900;
+    font-size:24px;
 }
 input[type=checkbox]{
   /* Double-sized Checkboxes */
@@ -79,7 +81,7 @@ input[type=checkbox]{
 }
 #pcr-pop p{
     margin-bottom: 0;
-    font-size: 12px;
+    font-size: 14px;
 }
 .enr_info span{
     color: #448843
@@ -89,7 +91,7 @@ input[type=checkbox]{
 }
 #pcr-pop .pcr-name{
     font-weight: 800;
-    font-size: 14px;
+    font-size: 16px;
     color: #222;
     margin-bottom: 0;
 }
@@ -98,11 +100,14 @@ input[type=checkbox]{
 }
 .hosp-pop h3{
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 700;
     margin-bottom: 0;
 }
 .hosp-pop p{
     margin-bottom: 5px;
+}
+.hosp-pop p span{
+    font-style: italic;
 }
 .hosp-pop .enrolled{
     color:green;
