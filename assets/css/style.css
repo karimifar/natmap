@@ -119,3 +119,28 @@ input[type=checkbox]{
     color: #D1618B;
 }
 
+
+@media only screen and (max-width: 600px){
+    #menu{
+        bottom:0;
+        left:0;
+        padding: 10px;
+        border-radius: 0;
+        width:100%;
+        font-size:14px;
+    }
+    #menu h3{
+        font-size: 18px;
+    }
+    input[type=checkbox]{
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(1); /* IE */
+        -moz-transform: scale(1); /* FF */
+        -webkit-transform: scale(1); /* Safari and Chrome */
+        -o-transform: scale(1); /* Opera */
+        transform: scale(1);
+        padding: 5px;
+        width:1em;
+    }
+
+}
