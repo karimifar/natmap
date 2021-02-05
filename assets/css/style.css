@@ -35,6 +35,11 @@
     font-weight: 900;
     font-size:24px;
 }
+#up-date{
+    margin-top: 12px;
+    font-size: 10px;
+    margin-bottom: 0;
+}
 input[type=checkbox]{
   /* Double-sized Checkboxes */
   -ms-transform: scale(1.5); /* IE */

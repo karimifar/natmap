@@ -20,12 +20,14 @@ $.get(req_url, function(data){
     $("#tot-inp").html("("+total.in_progress_n+")")
     $("#menu form").append("Total number of birthing hospitals: "+total.hospitals_t)
 
+    var up_date = "Last updated on "+total.pcr;
     var enrBar= "<div class='bar enr-p' style=width:"+total.enrolled_p+"%><div>"
     var inpBar= "<div class='bar inp-p' style=width:"+total.in_progress_p+"%><div>"
     var barchart = $("<div class='barchart'>")
         .append(enrBar)
         .append(inpBar)
     $("#menu").append(barchart)
+    .append("<p id='up-date'>"+up_date+"</p>")
 
 })
 
@@ -218,11 +220,11 @@ map.on('load', function () {
             // console.log(feature.state)
             
             var coordinates = feature.geometry.coordinates.slice();
-            var enrollment = feature.properties.Enrollment_Status;
-            var county = feature.properties.County_of_Location;
+            var enrollment = feature.properties.enr_status;
+            var county = feature.properties.county;
             var enroll_class = enrollment.replace(/\s+/g, '-').toLowerCase();
 
-            var description = '<p class='+enroll_class+'>' + enrollment + '</p><h3>' + feature.properties.Facility_Name + '</h3><p>Located in: <span>'+county+" county</span></p>"
+            var description = '<p class='+enroll_class+'>' + enrollment + '</p><h3>' + feature.properties.name + '</h3><p>Located in <span>'+county+" County</span></p>"
              
             // Populate the popup and set its coordinates
             // based on the feature found.
