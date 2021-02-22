@@ -18,7 +18,7 @@ $.get(req_url, function(data){
     console.log(total)
     $("#tot-enr").html("("+total.enrolled_n+")")
     $("#tot-inp").html("("+total.in_progress_n+")")
-    $("#menu form").append("Total number of birthing hospitals: "+total.hospitals_t)
+    $("#menu form").append("Total number of birthing/neonatal care hospitals: "+total.hospitals_t)
 
     var up_date = "Last updated on "+total.pcr;
     var enrBar= "<div class='bar enr-p' style=width:"+total.enrolled_p+"%><div>"
